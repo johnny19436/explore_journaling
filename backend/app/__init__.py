@@ -2,10 +2,25 @@ from flask import Flask, request, jsonify
 from flask_pymongo import PyMongo
 from flask_cors import CORS
 import os
+from pymongo.errors import ConnectionFailure
 
 app = Flask(__name__)
-app.config["MONGO_URI"] = os.environ.get("MONGODB_URI", "mongodb://mongodb:27017/journal_db")
-mongo = PyMongo(app)
+
+# MongoDB Atlas connection string with database name
+MONGODB_URI = "mongodb+srv://johnny194369672:qsbWWWPQiFUSeA8H@cluster0.oigb5.mongodb.net/journal_db?retryWrites=true&w=majority&appName=Cluster0"
+
+# Use environment variable if available, otherwise use the direct connection string
+app.config["MONGO_URI"] = os.environ.get("MONGODB_URI", MONGODB_URI)
+
+try:
+    mongo = PyMongo(app)
+    # Test the connection
+    mongo.db.command('ping')
+    print("Connected to MongoDB!")
+except ConnectionFailure as e:
+    print(f"Could not connect to MongoDB: {e}")
+    raise e
+
 CORS(app)
 
 # Add a root route handler

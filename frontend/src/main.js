@@ -46,10 +46,12 @@ if (process.env.NODE_ENV === 'development') {
   axios.defaults.baseURL = 'http://localhost:3000'
 }
 
+// Add axios interceptor for authentication
 axios.interceptors.request.use(config => {
   const token = localStorage.getItem('token')
   if (token) {
-    config.headers.Authorization = `Bearer ${token}`
+    // Make sure token is properly formatted
+    config.headers.Authorization = token.startsWith('Bearer ') ? token : `Bearer ${token}`
   }
   return config
 }, error => {
@@ -60,6 +62,7 @@ axios.interceptors.response.use(response => {
   return response
 }, error => {
   if (error.response && error.response.status === 401) {
+    console.log('Token expired or invalid, redirecting to login')
     localStorage.removeItem('token')
     localStorage.removeItem('user')
     router.push('/login')

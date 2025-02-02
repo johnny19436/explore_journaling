@@ -5,42 +5,75 @@ from bson import ObjectId
 from functools import wraps
 import jwt
 import datetime
+import os
 
 # Secret key for JWT
-app.config['SECRET_KEY'] = 'your-secret-key'  # Change this in production
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key-for-development')
 
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         token = request.headers.get('Authorization')
         if not token:
+            print("No token found")
             return jsonify({'message': 'Token is missing'}), 401
         try:
-            token = token.split()[1]  # Remove 'Bearer ' prefix
+            # Remove 'Bearer ' prefix if it exists
+            if token.startswith('Bearer '):
+                token = token.split(' ')[1]
+            
+            print(f"Decoding token: {token}")
             data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+            print(f"Token data: {data}")
+            
             current_user = mongo.db.users.find_one({"_id": data['user_id']})
             if not current_user:
-                return jsonify({'message': 'Invalid token'}), 401
-        except:
+                print("User not found")
+                return jsonify({'message': 'User not found'}), 401
+                
+            print(f"User authenticated: {current_user['username']}")
+            return f(current_user, *args, **kwargs)
+        except jwt.ExpiredSignatureError:
+            print("Token expired")
+            return jsonify({'message': 'Token has expired'}), 401
+        except jwt.InvalidTokenError as e:
+            print(f"Invalid token: {str(e)}")
             return jsonify({'message': 'Invalid token'}), 401
-        return f(current_user, *args, **kwargs)
+        except Exception as e:
+            print(f"Authentication error: {str(e)}")
+            return jsonify({'message': 'Authentication failed'}), 401
     return decorated
 
 @app.route('/api/auth/signup', methods=['POST'])
 def signup():
-    data = request.get_json()
-    
-    if mongo.db.users.find_one({"email": data['email']}):
-        return jsonify({"message": "Email already registered"}), 400
-    
-    user = User(
-        username=data['username'],
-        email=data['email'],
-        password=data['password']
-    )
-    
-    mongo.db.users.insert_one(user.to_dict())
-    return jsonify({"message": "User created successfully"}), 201
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"message": "No data provided"}), 400
+            
+        required_fields = ['username', 'email', 'password']
+        if not all(field in data for field in required_fields):
+            return jsonify({"message": "Missing required fields"}), 400
+        
+        # Check if email exists
+        existing_user = mongo.db.users.find_one({"email": data['email']})
+        if existing_user:
+            return jsonify({"message": "Email already registered"}), 400
+        
+        user = User(
+            username=data['username'],
+            email=data['email'],
+            password=data['password']
+        )
+        
+        result = mongo.db.users.insert_one(user.to_dict())
+        if result.inserted_id:
+            return jsonify({"message": "User created successfully"}), 201
+        return jsonify({"message": "Failed to create user"}), 500
+            
+    except Exception as e:
+        print(f"Error in signup: {str(e)}")
+        return jsonify({"message": "Internal server error"}), 500
 
 @app.route('/api/auth/login', methods=['POST'])
 def login():
@@ -77,8 +110,13 @@ def login():
 @app.route('/api/journals', methods=['GET'])
 @token_required
 def get_journals(current_user):
-    journals = mongo.db.journals.find()
-    return jsonify([Journal(**journal).to_dict() for journal in journals])
+    try:
+        print(f"Getting journals for user: {current_user['username']}")
+        journals = list(mongo.db.journals.find())
+        return jsonify([Journal(**journal).to_dict() for journal in journals])
+    except Exception as e:
+        print(f"Error getting journals: {str(e)}")
+        return jsonify({'message': 'Error retrieving journals'}), 500
 
 @app.route('/api/journals', methods=['POST'])
 @token_required
