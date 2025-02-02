@@ -6,6 +6,9 @@ from functools import wraps
 import jwt
 import datetime
 import os
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Secret key for JWT
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key-for-development')
@@ -15,32 +18,32 @@ def token_required(f):
     def decorated(*args, **kwargs):
         token = request.headers.get('Authorization')
         if not token:
-            print("No token found")
+            logger.warning("No token provided")
             return jsonify({'message': 'Token is missing'}), 401
         try:
             # Remove 'Bearer ' prefix if it exists
             if token.startswith('Bearer '):
                 token = token.split(' ')[1]
             
-            print(f"Decoding token: {token}")
+            logger.info(f"Decoding token: {token}")
             data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
-            print(f"Token data: {data}")
+            logger.info(f"Token data: {data}")
             
             current_user = mongo.db.users.find_one({"_id": data['user_id']})
             if not current_user:
-                print("User not found")
+                logger.warning("User not found")
                 return jsonify({'message': 'User not found'}), 401
                 
-            print(f"User authenticated: {current_user['username']}")
+            logger.info(f"User authenticated: {current_user['username']}")
             return f(current_user, *args, **kwargs)
         except jwt.ExpiredSignatureError:
-            print("Token expired")
+            logger.error("Token expired")
             return jsonify({'message': 'Token has expired'}), 401
         except jwt.InvalidTokenError as e:
-            print(f"Invalid token: {str(e)}")
+            logger.error(f"Invalid token: {str(e)}")
             return jsonify({'message': 'Invalid token'}), 401
         except Exception as e:
-            print(f"Authentication error: {str(e)}")
+            logger.error(f"Authentication error: {str(e)}")
             return jsonify({'message': 'Authentication failed'}), 401
     return decorated
 
@@ -110,12 +113,12 @@ def login():
 @app.route('/api/journals', methods=['GET'])
 @token_required
 def get_journals(current_user):
+    logger.info(f"Getting journals for user: {current_user['username']}")
     try:
-        print(f"Getting journals for user: {current_user['username']}")
         journals = list(mongo.db.journals.find())
         return jsonify([Journal(**journal).to_dict() for journal in journals])
     except Exception as e:
-        print(f"Error getting journals: {str(e)}")
+        logger.error(f"Error getting journals: {str(e)}")
         return jsonify({'message': 'Error retrieving journals'}), 500
 
 @app.route('/api/journals', methods=['POST'])
