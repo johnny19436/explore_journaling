@@ -4,7 +4,7 @@ from flask_cors import CORS
 import os
 from pymongo.errors import ConnectionFailure
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='../frontend/dist', static_url_path='')
 
 # MongoDB Atlas connection string with database name
 MONGODB_URI = "mongodb+srv://johnny194369672:qsbWWWPQiFUSeA8H@cluster0.oigb5.mongodb.net/journal_db?retryWrites=true&w=majority&appName=Cluster0"
@@ -30,13 +30,15 @@ CORS(app, resources={
     }
 })
 
-# Serve frontend static files
-@app.route('/', defaults={'path': ''})
+@app.route('/')
+def serve_frontend():
+    return app.send_static_file('index.html')
+
 @app.route('/<path:path>')
-def serve(path):
-    if path and os.path.exists(f"frontend/dist/{path}"):
-        return send_from_directory('frontend/dist', path)
-    return send_from_directory('frontend/dist', 'index.html')
+def static_proxy(path):
+    if path.startswith('api/'):
+        return app.view_functions[path]()
+    return app.send_static_file(path)
 
 # Import routes after app is created
 from app import routes

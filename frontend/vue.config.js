@@ -4,5 +4,6 @@ module.exports = {
     host: '0.0.0.0'
   },
   publicPath: '/',
-  outputDir: 'dist'
+  outputDir: 'dist',
+  assetsDir: 'assets'
 } 
