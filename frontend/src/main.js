@@ -5,6 +5,7 @@ import Home from './views/Home.vue'
 import CreateJournal from './views/CreateJournal.vue'
 import Login from './views/Login.vue'
 import Signup from './views/Signup.vue'
+import axios from 'axios'
 
 Vue.use(VueRouter)
 Vue.config.productionTip = false
@@ -40,14 +41,30 @@ router.beforeEach((to, from, next) => {
   }
 })
 
-// Add axios interceptor for authentication
-import axios from 'axios'
+// Set base URL for development
+if (process.env.NODE_ENV === 'development') {
+  axios.defaults.baseURL = 'http://localhost:3000'
+}
+
 axios.interceptors.request.use(config => {
   const token = localStorage.getItem('token')
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
   return config
+}, error => {
+  return Promise.reject(error)
+})
+
+axios.interceptors.response.use(response => {
+  return response
+}, error => {
+  if (error.response && error.response.status === 401) {
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+    router.push('/login')
+  }
+  return Promise.reject(error)
 })
 
 new Vue({

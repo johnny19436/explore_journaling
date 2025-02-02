@@ -45,7 +45,7 @@ export default {
   methods: {
     async handleLogin() {
       try {
-        const response = await axios.post('http://localhost:3000/api/auth/login', this.credentials);
+        const response = await axios.post('/api/auth/login', this.credentials);
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('user', JSON.stringify(response.data.user));
         this.$router.push('/');

@@ -27,3 +27,14 @@ yarn-error.log*
 ._*
 .Spotlight-V100
 .Trashes
+
+# Build output
+dist
+build
+__pycache__
+
+# Vercel
+.vercel
+
+# MongoDB
+data

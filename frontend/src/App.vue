@@ -13,7 +13,7 @@
         <template v-if="isLoggedIn">
           <span class="username">{{ username }}</span>
           <button class="logout-btn" @click="logout">
-            <i class="fas fa-sign-out-alt"></i>
+            <i class="fas fa-siggit branch -M mainn-out-alt"></i>
           </button>
         </template>
       </div>

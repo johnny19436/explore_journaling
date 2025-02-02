@@ -266,7 +266,7 @@ export default {
 
     async loadJournals() {
       try {
-        const response = await axios.get('http://localhost:3000/api/journals');
+        const response = await axios.get('/api/journals');
         // Compare with existing journals to find new ones
         const newJournals = response.data.filter(newJournal => 
           !this.journals.some(existingJournal => existingJournal._id === newJournal._id)
@@ -323,19 +323,40 @@ export default {
 
     async submitJournal() {
       try {
-        const response = await axios.post('http://localhost:3000/api/journals', this.newJournal);
+        const token = localStorage.getItem('token');
+        console.log('Submitting journal:', this.newJournal);
+        console.log('Using token:', token);
+        
+        const response = await axios.post('/api/journals', this.newJournal, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        });
+        
         const newJournal = response.data;
+        console.log('Journal created:', newJournal);
         
-        // Add new journal to the list
         this.journals.push(newJournal);
-        
-        // Create new bubble for the journal
         this.addNewJournalBubbles([newJournal]);
-        
-        // Close the form
         this.closeCreateForm();
       } catch (error) {
-        console.error('Error:', error);
+        console.error('Full error:', error);
+        console.error('Error config:', error.config);
+        console.error('Error response:', error.response);
+        
+        let errorMessage = 'Error creating journal: ';
+        if (error.response && error.response.data && error.response.data.message) {
+          errorMessage += error.response.data.message;
+        } else if (error.response && error.response.statusText) {
+          errorMessage += error.response.statusText;
+        } else if (error.request) {
+          errorMessage += 'No response received from server';
+        } else {
+          errorMessage += error.message;
+        }
+        alert(errorMessage);
       }
     }
   },

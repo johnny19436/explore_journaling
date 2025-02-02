@@ -54,7 +54,7 @@ export default {
   methods: {
     async handleSignup() {
       try {
-        await axios.post('http://localhost:3000/api/auth/signup', this.user);
+        await axios.post('/api/auth/signup', this.user);
         this.$router.push('/login');
       } catch (error) {
         console.error('Signup error:', error);

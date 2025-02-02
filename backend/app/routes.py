@@ -83,14 +83,33 @@ def get_journals(current_user):
 @app.route('/api/journals', methods=['POST'])
 @token_required
 def create_journal(current_user):
-    data = request.get_json()
-    journal = Journal(
-        title=data['title'],
-        content=data['content'],
-        author=current_user['username']
-    )
-    mongo.db.journals.insert_one(journal.to_dict())
-    return jsonify(journal.to_dict()), 201
+    try:
+        print("Received journal creation request")
+        data = request.get_json()
+        print(f"Request data: {data}")
+        
+        if not data:
+            return jsonify({"message": "No data provided"}), 400
+            
+        if 'title' not in data or 'content' not in data:
+            return jsonify({"message": "Missing required fields"}), 400
+
+        journal = Journal(
+            title=data['title'],
+            content=data['content'],
+            author=current_user['username']
+        )
+        print(f"Created journal object: {journal.to_dict()}")
+        
+        result = mongo.db.journals.insert_one(journal.to_dict())
+        print(f"Insert result: {result.inserted_id}")
+        
+        if result.inserted_id:
+            return jsonify(journal.to_dict()), 201
+        return jsonify({"message": "Failed to create journal"}), 500
+    except Exception as e:
+        print(f"Error creating journal: {str(e)}")
+        return jsonify({"message": str(e)}), 400
 
 @app.route('/api/journals/<journal_id>', methods=['GET'])
 @token_required

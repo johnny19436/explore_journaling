@@ -1,0 +1,37 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "backend/app/__init__.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": { "distDir": "dist" }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/journals",
+      "methods": ["POST", "GET"],
+      "dest": "/backend/app/__init__.py"
+    },
+    {
+      "src": "/api/auth/(.*)",
+      "methods": ["POST"],
+      "dest": "/backend/app/__init__.py"
+    },
+    {
+      "src": "/api/(.*)",
+      "dest": "/backend/app/__init__.py"
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/frontend/dist/$1"
+    }
+  ]
+} 
