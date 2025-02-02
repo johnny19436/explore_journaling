@@ -8,30 +8,33 @@
     {
       "src": "frontend/package.json",
       "use": "@vercel/static-build",
-      "config": { "distDir": "dist" }
+      "config": { 
+        "distDir": "dist",
+        "buildCommand": "cd frontend && npm install && npm run build"
+      }
     }
   ],
   "routes": [
     {
       "src": "/api/journals",
       "methods": ["POST", "GET"],
-      "dest": "/backend/app/__init__.py"
+      "dest": "backend/app/__init__.py"
     },
     {
       "src": "/api/auth/(.*)",
       "methods": ["POST"],
-      "dest": "/backend/app/__init__.py"
+      "dest": "backend/app/__init__.py"
     },
     {
       "src": "/api/(.*)",
-      "dest": "/backend/app/__init__.py"
+      "dest": "backend/app/__init__.py"
     },
     {
       "handle": "filesystem"
     },
     {
       "src": "/(.*)",
-      "dest": "/frontend/dist/$1"
+      "dest": "frontend/dist/$1"
     }
   ]
 } 
