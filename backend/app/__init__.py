@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_pymongo import PyMongo
 from flask_cors import CORS
 import os
@@ -21,12 +21,22 @@ except ConnectionFailure as e:
     print(f"Could not connect to MongoDB: {e}")
     raise e
 
-CORS(app)
+# Configure CORS to allow all origins
+CORS(app, resources={
+    r"/api/*": {
+        "origins": "*",
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"]
+    }
+})
 
-# Add a root route handler
-@app.route('/')
-def home():
-    return "API is running"
+# Serve frontend static files
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve(path):
+    if path and os.path.exists(f"frontend/dist/{path}"):
+        return send_from_directory('frontend/dist', path)
+    return send_from_directory('frontend/dist', 'index.html')
 
 # Import routes after app is created
 from app import routes

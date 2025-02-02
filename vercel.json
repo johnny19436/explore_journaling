@@ -16,16 +16,6 @@
   ],
   "routes": [
     {
-      "src": "/api/journals",
-      "methods": ["POST", "GET"],
-      "dest": "backend/app/__init__.py"
-    },
-    {
-      "src": "/api/auth/(.*)",
-      "methods": ["POST"],
-      "dest": "backend/app/__init__.py"
-    },
-    {
       "src": "/api/(.*)",
       "dest": "backend/app/__init__.py"
     },
@@ -34,7 +24,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "frontend/dist/$1"
+      "dest": "frontend/dist/index.html"
     }
   ]
 } 
