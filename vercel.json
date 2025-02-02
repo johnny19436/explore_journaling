@@ -3,7 +3,11 @@
   "builds": [
     {
       "src": "backend/app/__init__.py",
-      "use": "@vercel/python"
+      "use": "@vercel/python",
+      "config": {
+        "maxLambdaSize": "15mb",
+        "includeFiles": ["backend/app/**"]
+      }
     },
     {
       "src": "frontend/package.json",
@@ -17,34 +21,39 @@
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "backend/app/__init__.py"
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Accept, Authorization"
+      },
+      "dest": "/backend/app/__init__.py",
+      "continue": true
     },
     {
-      "src": "/static/(.*)",
-      "dest": "/dist/static/$1"
+      "src": "/api/(.*)",
+      "methods": ["OPTIONS"],
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Accept, Authorization"
+      },
+      "status": 200
     },
     {
-      "src": "/js/(.*)",
-      "dest": "/dist/js/$1"
-    },
-    {
-      "src": "/css/(.*)",
-      "dest": "/dist/css/$1"
-    },
-    {
-      "src": "/img/(.*)",
-      "dest": "/dist/img/$1"
-    },
-    {
-      "src": "/favicon.ico",
-      "dest": "/dist/favicon.ico"
+      "handle": "filesystem"
     },
     {
       "src": "/(.*)",
-      "dest": "/dist/index.html",
-      "headers": {
-        "Cache-Control": "no-store"
-      }
+      "dest": "/dist/index.html"
     }
-  ]
+  ],
+  "functions": {
+    "backend/app/__init__.py": {
+      "memory": 1024,
+      "maxDuration": 10
+    }
+  },
+  "env": {
+    "PYTHONUNBUFFERED": "1"
+  }
 } 

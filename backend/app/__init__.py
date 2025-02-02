@@ -4,9 +4,17 @@ from flask_cors import CORS
 import os
 from pymongo.errors import ConnectionFailure
 import logging
+import sys
+import traceback
 
 # Configure logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(sys.stdout)
+    ]
+)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
@@ -37,15 +45,15 @@ CORS(app, resources={
 
 @app.before_request
 def log_request_info():
-    logger.info('Headers: %s', request.headers)
-    logger.info('Body: %s', request.get_data())
-    logger.info('Path: %s', request.path)
-    logger.info('Method: %s', request.method)
+    logger.debug('Headers: %s', dict(request.headers))
+    logger.debug('Body: %s', request.get_data())
+    logger.debug('URL: %s', request.url)
+    logger.debug('Method: %s', request.method)
 
 @app.after_request
 def log_response_info(response):
-    logger.info('Response Status: %s', response.status)
-    logger.info('Response Headers: %s', response.headers)
+    logger.debug('Response Status: %s', response.status)
+    logger.debug('Response Headers: %s', dict(response.headers))
     return response
 
 # Add a root route handler
@@ -66,4 +74,10 @@ def not_found(e):
 @app.route('/api/test')
 def test():
     logger.info("Test route accessed")
-    return jsonify({"message": "API is working"}), 200 
+    return jsonify({"message": "API is working"}), 200
+
+@app.errorhandler(Exception)
+def handle_exception(e):
+    logger.error('Unhandled Exception: %s', str(e))
+    logger.error('Traceback: %s', traceback.format_exc())
+    return jsonify({"error": str(e)}), 500 
