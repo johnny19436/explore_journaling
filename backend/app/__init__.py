@@ -21,12 +21,19 @@ except ConnectionFailure as e:
     print(f"Could not connect to MongoDB: {e}")
     raise e
 
-CORS(app)
+# Configure CORS properly
+CORS(app, resources={
+    r"/api/*": {
+        "origins": "*",
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"]
+    }
+})
 
 # Add a root route handler
 @app.route('/')
 def home():
-    return "API is running"
+    return jsonify({"message": "API is running"}), 200
 
 # Import routes after app is created
 from app import routes
@@ -34,7 +41,7 @@ from app import routes
 # Add error handler
 @app.errorhandler(404)
 def not_found(e):
-    return {"error": "Route not found"}, 404
+    return jsonify({"error": "Route not found"}), 404
 
 @app.route('/api/test')
 def test():
