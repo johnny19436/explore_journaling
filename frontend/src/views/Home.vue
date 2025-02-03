@@ -5,8 +5,7 @@
          class="journal-bubble"
          :id="'journal-' + journal._id"
          @mousedown="startClick(journal)"
-         @mouseup="endClick"
-         @mouseleave="endClick">
+         @mouseup="endClick">
       <div class="journal-content">
         <h3>{{ journal.title }}</h3>
         <p class="author">{{ journal.author }}</p>
