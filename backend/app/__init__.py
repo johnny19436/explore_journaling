@@ -27,7 +27,7 @@ except ConnectionFailure as e:
     raise e
 
 # Configure CORS properly
-CORS(app, resources={
+CORS(app, supports_credentials=True, resources={
     r"/*": {
         "origins": "*",
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
