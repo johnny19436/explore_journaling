@@ -4,20 +4,15 @@ from flask_cors import CORS
 import os
 from pymongo.errors import ConnectionFailure
 import logging
-import sys
-import traceback
 
 # Configure logging
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.StreamHandler(sys.stdout)
-    ]
-)
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
+
+# Set port
+port = int(os.environ.get("PORT", 3000))
 
 # MongoDB Atlas connection string with database name
 MONGODB_URI = "mongodb+srv://johnny194369672:qsbWWWPQiFUSeA8H@cluster0.oigb5.mongodb.net/journal_db?retryWrites=true&w=majority&appName=Cluster0"
@@ -45,15 +40,15 @@ CORS(app, resources={
 
 @app.before_request
 def log_request_info():
-    logger.debug('Headers: %s', dict(request.headers))
-    logger.debug('Body: %s', request.get_data())
-    logger.debug('URL: %s', request.url)
-    logger.debug('Method: %s', request.method)
+    logger.info('Headers: %s', request.headers)
+    logger.info('Body: %s', request.get_data())
+    logger.info('Path: %s', request.path)
+    logger.info('Method: %s', request.method)
 
 @app.after_request
 def log_response_info(response):
-    logger.debug('Response Status: %s', response.status)
-    logger.debug('Response Headers: %s', dict(response.headers))
+    logger.info('Response Status: %s', response.status)
+    logger.info('Response Headers: %s', response.headers)
     return response
 
 # Add a root route handler
@@ -76,8 +71,5 @@ def test():
     logger.info("Test route accessed")
     return jsonify({"message": "API is working"}), 200
 
-@app.errorhandler(Exception)
-def handle_exception(e):
-    logger.error('Unhandled Exception: %s', str(e))
-    logger.error('Traceback: %s', traceback.format_exc())
-    return jsonify({"error": str(e)}), 500 
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=port) 
