@@ -47,7 +47,7 @@
       </div>
     </div>
 
-    <!-- Modal -->
+    <!-- Journal Detail Modal -->
     <div class="modal" v-if="selectedJournal" @click.self="closeJournal">
       <div class="modal-content">
         <h2>{{ selectedJournal.title }}</h2>
@@ -255,9 +255,7 @@ export default {
     },
 
     showJournalDetail(journal) {
-      if (!this.mouseConstraint.body) {
-        this.selectedJournal = journal;
-      }
+      this.selectedJournal = journal;
     },
 
     closeJournal() {
