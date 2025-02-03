@@ -4,7 +4,9 @@
          :key="journal._id" 
          class="journal-bubble"
          :id="'journal-' + journal._id"
-         @click="showJournalDetail(journal)">
+         @mousedown="startClick(journal)"
+         @mouseup="endClick"
+         @mouseleave="endClick">
       <div class="journal-content">
         <h3>{{ journal.title }}</h3>
         <p class="author">{{ journal.author }}</p>
@@ -84,7 +86,11 @@ export default {
       newJournal: {
         title: '',
         content: ''
-      }
+      },
+      clickTimer: null,
+      clickDuration: 300, // Duration in milliseconds to differentiate click types
+      currentJournal: null, // To hold the reference to the current journal
+      isLongClick: false, // Flag to track if it's a long click
     }
   },
   methods: {
@@ -145,18 +151,8 @@ export default {
       mouse.mousedown = mouse.mouseup;
       mouse.mousemove = mouse.mouseup;
 
-      // Create walls using adjusted bounds
-    //   const walls = [
-    //     Bodies.rectangle(bounds.width/2, bounds.height + headerHeight, bounds.width, 60, { 
-    //       isStatic: true
-    //     }),
-    //     Bodies.rectangle(0, bounds.height/2 + headerHeight, 60, bounds.height, { 
-    //       isStatic: true
-    //     }),
-    //     Bodies.rectangle(bounds.width, bounds.height/2 + headerHeight, 60, bounds.height, { 
-    //       isStatic: true
-    //     })
-    //   ];
+      
+    //     Bodie
       const walls = [
         Bodies.rectangle(bounds.width/2, bounds.height, bounds.width, 60, { 
         isStatic: true
@@ -254,14 +250,27 @@ export default {
       });
     },
 
+    startClick(journal) {
+      this.currentJournal = journal; // Store the current journal reference
+      this.isLongClick = false; // Reset the long click flag
+      this.clickTimer = setTimeout(() => {
+        // Long click detected, enable drag-and-drop
+        this.isLongClick = true; // Set the long click flag
+      }, this.clickDuration);
+    },
+    endClick() {
+      clearTimeout(this.clickTimer);
+      // Short click detected, show journal details
+      if (!this.isLongClick) {
+        this.showJournalDetail(this.currentJournal); // Show journal details on short click
+      }
+    },
     showJournalDetail(journal) {
       this.selectedJournal = journal;
     },
-
     closeJournal() {
       this.selectedJournal = null;
     },
-
     async loadJournals() {
       try {
         const response = await axios.get('/api/journals');
