@@ -11,9 +11,6 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
-# Set port
-port = int(os.environ.get("PORT", 3000))
-
 # MongoDB Atlas connection string with database name
 MONGODB_URI = "mongodb+srv://johnny194369672:qsbWWWPQiFUSeA8H@cluster0.oigb5.mongodb.net/journal_db?retryWrites=true&w=majority&appName=Cluster0"
 
@@ -31,7 +28,7 @@ except ConnectionFailure as e:
 
 # Configure CORS properly
 CORS(app, resources={
-    r"/api/*": {
+    r"/*": {
         "origins": "*",
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization"]
@@ -70,6 +67,4 @@ def not_found(e):
 def test():
     logger.info("Test route accessed")
     return jsonify({"message": "API is working"}), 200
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=port) 
+ 

@@ -41,10 +41,8 @@ router.beforeEach((to, from, next) => {
   }
 })
 
-// Set base URL for development
-if (process.env.NODE_ENV === 'development') {
-  axios.defaults.baseURL = 'http://localhost:3000'
-}
+// Set base URL
+axios.defaults.baseURL = 'https://explore-journaling.onrender.com'
 
 // Add axios interceptor for authentication
 axios.interceptors.request.use(config => {
@@ -53,6 +51,9 @@ axios.interceptors.request.use(config => {
     // Make sure token is properly formatted
     config.headers.Authorization = token.startsWith('Bearer ') ? token : `Bearer ${token}`
   }
+  // Add CORS headers
+  config.headers['Access-Control-Allow-Origin'] = '*'
+  config.headers['Access-Control-Allow-Methods'] = 'GET,PUT,POST,DELETE,PATCH,OPTIONS'
   return config
 }, error => {
   return Promise.reject(error)

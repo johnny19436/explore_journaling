@@ -41,7 +41,8 @@ export default {
   methods: {
     async submitJournal() {
       try {
-        await axios.post('http://localhost:3000/api/journals', this.journal);
+        // await axios.post('http://localhost:3000/api/journals', this.journal);
+        await axios.post('/api/journals', this.journal);
         this.$router.push('/');
       } catch (error) {
         console.error('Error:', error);
