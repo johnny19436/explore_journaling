@@ -4,6 +4,7 @@ from flask_cors import CORS
 import os
 from pymongo.errors import ConnectionFailure
 import logging
+from threading import Thread
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -34,6 +35,11 @@ CORS(app, supports_credentials=True, resources={
         "allow_headers": ["Content-Type", "Authorization", "Access-Control-Allow-Methods", "Access-Control-Allow-Origin"]
     }
 })
+
+# Start the shrink circle thread
+from app.update_scores import update_scores  # Import the shrink function
+Thread(target=update_scores, daemon=True).start()
+
 
 @app.before_request
 def log_request_info():
@@ -67,4 +73,9 @@ def not_found(e):
 def test():
     logger.info("Test route accessed")
     return jsonify({"message": "API is working"}), 200
+
+# def create_app():
+#     app = Flask(__name__)
+#     # ... other initialization code ...
+#     return app
  

@@ -4,11 +4,13 @@
          :key="journal._id" 
          class="journal-bubble"
          :id="'journal-' + journal._id"
+         :style="{ width: journal.score * 2 - 18 + 'px', height: journal.score * 2 - 18 + 'px', borderRadius: '50%' }"
          @mousedown="startClick(journal)"
          @mouseup="endClick">
       <div class="journal-content">
         <h3>{{ journal.title }}</h3>
         <p class="author">{{ journal.author }}</p>
+        <p class="score">Score: {{ journal.score }}</p>
       </div>
     </div>
 
@@ -175,8 +177,8 @@ export default {
 
     addJournalBubbles() {
       const container = this.$refs.physicsContainer;
-      const radius = 83;
-      const minSpacing = radius * 2.2; // Minimum space between circles
+      // const radius = journal.score;
+      // const minSpacing = radius * 2.2; // Minimum space between circles
       
       // Shuffle journals for random order
       const shuffledJournals = [...this.journals].sort(() => Math.random() - 0.5);
@@ -188,6 +190,9 @@ export default {
         let x, y;
         let attempts = 0;
         let validPosition = false;
+
+        const radius = journal.score;
+        const minSpacing = radius * 2.2; // Minimum space between circles
         
         // Try to find a position that doesn't overlap with existing circles
         while (!validPosition && attempts < 50) {
@@ -306,7 +311,7 @@ export default {
 
         const bubble = Matter.Bodies.circle(x, y, radius, {
           friction: 0.8,
-          restitution: 0,
+          restitution: 0.2,
           density: 1.5,
           frictionAir: 0.02,
           label: journal._id,
@@ -602,5 +607,10 @@ export default {
   border: none;
   border-radius: 8px;
   cursor: pointer;
+}
+
+.score {
+  font-size: 1rem;
+  color: #0071e3; /* Change color as needed */
 }
 </style> 

@@ -43,6 +43,7 @@ router.beforeEach((to, from, next) => {
 
 // Set base URL
 axios.defaults.baseURL = 'https://explore-journaling.onrender.com'
+// axios.defaults.baseURL = 'http://localhost:3000'
 
 // Add axios interceptor for authentication
 axios.interceptors.request.use(config => {

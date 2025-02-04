@@ -21,11 +21,12 @@ class User:
         }
 
 class Journal:
-    def __init__(self, title, content, author, created_at=None, _id=None):
+    def __init__(self, title, content, author, score=83, created_at=None, _id=None):
         self._id = _id if _id else str(ObjectId())
         self.title = title
         self.content = content
         self.author = author
+        self.score = score
         self.created_at = created_at if created_at else datetime.utcnow()
     
     def to_dict(self):
@@ -34,5 +35,6 @@ class Journal:
             "title": self.title,
             "content": self.content,
             "author": self.author,
+            "score": self.score,
             "created_at": self.created_at
         } 
