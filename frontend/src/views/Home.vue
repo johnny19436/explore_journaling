@@ -10,7 +10,7 @@
       <div class="journal-content">
         <h3>{{ journal.title }}</h3>
         <p class="author">{{ journal.author }}</p>
-        <p class="score">Score: {{ journal.score }}</p>
+        <!-- <p class="score">Score: {{ journal.score }}</p> -->
       </div>
     </div>
 
@@ -113,7 +113,7 @@ export default {
             World = Matter.World;
 
       const container = this.$refs.physicsContainer;
-      const headerHeight = 80; // Match the container's top offset
+      const headerHeight = 40; // Match the container's top offset
       
       // Calculate bounds based on container
       const bounds = {
@@ -217,7 +217,7 @@ export default {
 
         const bubble = Matter.Bodies.circle(x, y, radius, {
           friction: 0.8,
-          restitution: 0.2,
+          restitution: 0.5,
           density: 1.5,
           frictionAir: 0.02,
           label: journal._id,
@@ -311,7 +311,7 @@ export default {
 
         const bubble = Matter.Bodies.circle(x, y, radius, {
           friction: 0.8,
-          restitution: 0.2,
+          restitution: 0.5,
           density: 1.5,
           frictionAir: 0.02,
           label: journal._id,
@@ -392,13 +392,13 @@ export default {
 <style scoped>
 .physics-container {
   position: fixed;
-  top: 80px; /* Reduced from 100px */
+  top: 40px; /* Reduced from 100px */
   left: 0;
   right: 0;
   bottom: 0;
   width: 100%;
-  height: calc(100% - 80px);
-  background: #f5f5f7;
+  height: calc(120% + 100px);
+  background: #2c3e50;
   z-index: 1;
   overflow: hidden;
 }
@@ -444,30 +444,6 @@ export default {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-/* Dark mode styles */
-:deep(.dark-mode) .journals-container {
-  background: #1c1c1e;
-  box-shadow: 
-    0 20px 40px rgba(0, 0, 0, 0.3),
-    0 0 0 1px rgba(255, 255, 255, 0.1);
-}
-
-:deep(.dark-mode) .journal-bubble {
-  background: #2c2c2e;
-}
-
-:deep(.dark-mode) .journal-bubble:active {
-  cursor: grabbing;
-}
-
-:deep(.dark-mode) .journal-content h3 {
-  color: #f5f5f7;
-}
-
-:deep(.dark-mode) .journal-content .author {
-  color: #98989d;
 }
 
 .modal {

@@ -1,26 +1,21 @@
 <template>
   <div id="app">
     <header class="app-header">
-      <div class="left-section">
-        <!-- Remove theme switcher -->
-      </div>
-      
+      <img src="@/logo_removebg.png" alt="Logo" class="logo" />
       <nav class="center-section" v-if="isLoggedIn">
         <router-link to="/">Home</router-link>
       </nav>
       
-      <div class="right-section">
-        <template v-if="isLoggedIn">
-          <span class="username">{{ username }}</span>
-          <button class="logout-btn" @click="logout">
-            <i class="fas fa-sign-out-alt"></i>
-          </button>
-        </template>
-      </div>
+      <template v-if="isLoggedIn">
+        <span class="username">{{ username }}</span>
+        <button class="logout-btn" @click="logout">
+          <i class="fas fa-sign-out-alt"></i>
+        </button>
+      </template>
     </header>
     
     <main class="app-content">
-      <router-view/>
+      <router-view />
     </main>
   </div>
 </template>
@@ -65,34 +60,41 @@ export default {
 </script>
 
 <style>
-html {
-  background: #fff;
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
 }
 
 #app {
   font-family: Arial, sans-serif;
-  max-width: 800px;
+  /* max-width: 800px; */
   margin: 0 auto;
   min-height: 100vh;
   transition: all 0.3s ease;
+  background: #2c3e50;
 }
 
 .app-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px;
-  margin-bottom: 20px;
+  padding: 5px;
+  padding-left: 20px;
+  padding-right: 20px;
+  /* background-color: #3e5871; */
+  background-color: #175da3;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
 }
 
-.left-section, .right-section {
-  flex: 1;
-  display: flex;
-  align-items: center;
-}
-
-.right-section {
-  justify-content: flex-end;
+.logo {
+  height: 45px;
+  margin-right: 20px;
+  margin-left: 10px;
 }
 
 .center-section {
@@ -122,6 +124,7 @@ html {
 
 .app-content {
   padding: 0 20px;
+  padding-top: 80px;
 }
 
 nav a {
