@@ -1,6 +1,6 @@
 <template>
   <div class="physics-container" ref="physicsContainer">
-    <div v-for="journal in journals" 
+    <div v-for="journal in filteredJournals" 
          :key="journal._id" 
          class="journal-bubble"
          :id="'journal-' + journal._id"
@@ -92,6 +92,11 @@ export default {
       clickDuration: 300, // Duration in milliseconds to differentiate click types
       currentJournal: null, // To hold the reference to the current journal
       isLongClick: false, // Flag to track if it's a long click
+    }
+  },
+  computed: {
+    filteredJournals() {
+      return this.journals.filter(journal => journal.score >= 10); // Filter journals with score >= 10
     }
   },
   methods: {
