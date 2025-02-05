@@ -8,4 +8,4 @@ def update_scores():
         for journal in journals:
             new_score = max(0, journal['score'] - 1)  # Decrease score by 10, ensure it doesn't go below 0
             mongo.db.journals.update_one({"_id": journal['_id']}, {"$set": {"score": new_score}})
-        time.sleep(5760)  # Update scores every 20 seconds
+        time.sleep(10000)  # Update scores every 20 seconds

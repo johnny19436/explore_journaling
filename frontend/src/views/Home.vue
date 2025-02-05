@@ -96,7 +96,7 @@ export default {
   },
   computed: {
     filteredJournals() {
-      return this.journals.filter(journal => journal.score >= 10); // Filter journals with score >= 10
+      return this.journals.filter(journal => journal.score >= 20); // Filter journals with score >= 10
     }
   },
   methods: {
